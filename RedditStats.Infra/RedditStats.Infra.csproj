@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.8" />
+	<PackageReference Include="Reddit" Version="1.5.2" />
+	<PackageReference Include="Reddit.AuthTokenRetrieverLib" Version="1.5.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RedditStats.AppCore\RedditStats.AppCore.csproj" />
+  </ItemGroup>
+</Project>
