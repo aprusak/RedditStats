@@ -18,7 +18,6 @@ namespace RedditStats.AppCore.Services
         
         public override void Start(TimeSpan monitoringInterval)
         {
-            Subreddit.Posts.GetNew();
             Subreddit.Posts.MonitorNew((int)monitoringInterval.TotalMilliseconds); // Turn on monitoring
             Subreddit.Posts.NewUpdated += OnUpdate;
         }

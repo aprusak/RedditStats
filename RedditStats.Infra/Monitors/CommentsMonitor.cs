@@ -17,7 +17,6 @@ namespace RedditStats.Infra.Monitors
 
         public override void Start(TimeSpan monitoringInterval)
         {
-            Subreddit.Comments.GetNew();
             Subreddit.Comments.MonitorNew((int)monitoringInterval.TotalMilliseconds); // Turn on monitoring
             Subreddit.Comments.NewUpdated += OnUpdate;
         }

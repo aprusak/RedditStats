@@ -16,7 +16,7 @@ namespace RedditStats.Infra.Queries
         public override Task<List<RedditPost>> GetAsync(CancellationToken token = default)
         {
             return Db.RedditPosts
-                .Select(p => new RedditPost { UpVotes = p.UpVotes, Title = p.Title, Author = p.Author, Permalink = $"https://reddit.com{p.Permalink}" })
+                .Select(p => new RedditPost { Id = p.Id, PostId = p.PostId, UpVotes = p.UpVotes, Title = p.Title, Author = p.Author, Permalink = $"https://reddit.com{p.Permalink}" })
                 .OrderByDescending(p => p.UpVotes)
                 .ToListAsync(token);
         }
