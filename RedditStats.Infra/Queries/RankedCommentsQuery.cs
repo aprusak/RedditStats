@@ -15,7 +15,7 @@ namespace RedditStats.Infra.Queries
         /// </summary>
         public override Task<List<RedditComment>> GetAsync(CancellationToken token = default)
         {
-            return Db.RedditComments
+            return Db.Set<RedditComment>()
                 .Select(c => new RedditComment { Id = c.Id, UpVotes = c.UpVotes, NumReplies = c.NumReplies, Author = c.Author, Permalink = $"https://reddit.com{c.Permalink}" })
                 .OrderByDescending(c => c.UpVotes)
                 .ToListAsync(token);

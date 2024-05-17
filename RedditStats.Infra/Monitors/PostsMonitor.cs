@@ -42,7 +42,7 @@ namespace RedditStats.AppCore.Services
 
                 Db.SaveChanges();
 
-                var existingUser = Db.RedditUsers.FirstOrDefault(u => u.Name == post.Author);
+                var existingUser = Db.Set<RedditUser>().FirstOrDefault(u => u.Name == post.Author);
 
                 if (existingUser != null)
                     // If the user from the post exists in the `db` (in monitoring window) increment the user total posts.

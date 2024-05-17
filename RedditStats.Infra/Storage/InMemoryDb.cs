@@ -26,12 +26,6 @@ namespace RedditStats.Infra.Storage
             modelBuilder.Entity<RedditComment>();
         }
 
-        public DbSet<RedditPost> RedditPosts { get; set; } = null!;
-
-        public DbSet<RedditUser> RedditUsers { get; set; } = null!;
-
-        public DbSet<RedditComment> RedditComments { get; set; } = null!;
-
         public override int SaveChanges(bool acceptAllchangesOnSuccess = true)
         {
             try

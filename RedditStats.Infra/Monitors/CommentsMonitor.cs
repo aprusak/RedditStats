@@ -41,7 +41,7 @@ namespace RedditStats.Infra.Monitors
 
                 Db.SaveChanges();
 
-                var existingUser = Db.RedditUsers.FirstOrDefault(u => u.Name == comment.Author);
+                var existingUser = Db.Set<RedditUser>().FirstOrDefault(u => u.Name == comment.Author);
 
                 if (existingUser != null)
                     // If the user from the comments exists in the `db` (in monitoring window) increment the user total comments.

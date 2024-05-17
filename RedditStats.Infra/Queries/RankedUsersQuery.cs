@@ -16,7 +16,7 @@ namespace RedditStats.AppCore.Services
         /// </summary>
         public override Task<List<RedditUser>> GetAsync(CancellationToken token = default)
         {
-            return Db.RedditUsers
+            return Db.Set<RedditUser>()
                 .Select(u => new RedditUser {Id = u.Id, Name = u.Name, TotalPosts = u.TotalPosts, TotalComments = u.TotalComments })
                 .OrderByDescending(u => u.TotalPosts + u.TotalComments) // Order by `u.TotalPosts + u.TotalComments` desc
                 .ToListAsync(token);
