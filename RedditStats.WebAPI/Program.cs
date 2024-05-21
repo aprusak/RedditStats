@@ -17,19 +17,19 @@ var config = section.Get<Config>() ?? throw new InvalidOperationException($"Can'
 builder.Services.AddLogging();
 
 // Register in-memory-db
-builder.Services.AddDbContext<InMemoryDb>(options => options.UseInMemoryDatabase("in-memory-db"), ServiceLifetime.Scoped);
+builder.Services.AddDbContext<InMemoryDb>(options => options.UseInMemoryDatabase("in-memory-db"), ServiceLifetime.Transient, ServiceLifetime.Transient);
 
 // Register queries. To extend support for new stats new queries may need to be added.
-builder.Services.AddScoped(sp => new QueryErrorDecorator<RedditPost>(new RankedPostsQuery(sp.CreateAsyncScope().ServiceProvider.GetRequiredService<InMemoryDb>()), sp.GetRequiredService<ILogger<RankedPostsQuery>>()));
-builder.Services.AddScoped(sp => new QueryErrorDecorator<RedditUser>(new RankedUsersQuery(sp.CreateAsyncScope().ServiceProvider.GetRequiredService<InMemoryDb>()), sp.GetRequiredService<ILogger<RankedUsersQuery>>()));
-builder.Services.AddScoped(sp => new QueryErrorDecorator<RedditComment>(new RankedCommentsQuery(sp.CreateAsyncScope().ServiceProvider.GetRequiredService<InMemoryDb>()), sp.GetRequiredService<ILogger<RankedCommentsQuery>>()));
+builder.Services.AddSingleton(sp => new QueryErrorDecorator<RedditPost>(new RankedPostsQuery(sp.GetRequiredService<InMemoryDb>()), sp.GetRequiredService<ILogger<RankedPostsQuery>>()));
+builder.Services.AddSingleton(sp => new QueryErrorDecorator<RedditUser>(new RankedUsersQuery(sp.GetRequiredService<InMemoryDb>()), sp.GetRequiredService<ILogger<RankedUsersQuery>>()));
+builder.Services.AddSingleton(sp => new QueryErrorDecorator<RedditComment>(new RankedCommentsQuery(sp.GetRequiredService<InMemoryDb>()), sp.GetRequiredService<ILogger<RankedCommentsQuery>>()));
 
 // Register Subreddit Factory
 builder.Services.AddSingleton<ISubredditFactory, SubredditFactory>(sp => new SubredditFactory(config.AppId, config.AccessToken, config.RefreshToken, sp.GetRequiredService<ILogger<SubredditFactory>>()));
 
 // Register monitors. To extend support for new stats new monitors may need to be added.
-builder.Services.AddTransient(sp => new PostsMonitor(sp.GetRequiredService<ISubredditFactory>().Create(config.Subreddit), sp.CreateAsyncScope().ServiceProvider.GetRequiredService<InMemoryDb>(), sp.GetRequiredService<ILogger<PostsMonitor>>()));
-builder.Services.AddTransient(sp => new CommentsMonitor(sp.GetRequiredService<ISubredditFactory>().Create(config.Subreddit), sp.CreateAsyncScope().ServiceProvider.GetRequiredService<InMemoryDb>(), sp.GetRequiredService<ILogger<CommentsMonitor>>()));
+builder.Services.AddSingleton(sp => new PostsMonitor(sp.GetRequiredService<ISubredditFactory>().Create(config.Subreddit), sp.GetRequiredService<InMemoryDb>(), sp.GetRequiredService<ILogger<PostsMonitor>>()));
+builder.Services.AddSingleton(sp => new CommentsMonitor(sp.GetRequiredService<ISubredditFactory>().Create(config.Subreddit), sp.GetRequiredService<InMemoryDb>(), sp.GetRequiredService<ILogger<CommentsMonitor>>()));
 
 var app = builder.Build();
 
