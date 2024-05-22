@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-
-namespace RedditStats.AppCore.Entities
+﻿namespace RedditStats.AppCore.Entities
 {
     public class RedditUser
     {

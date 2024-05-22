@@ -9,16 +9,16 @@ namespace RedditStats.Infra.Monitors
     /// </summary>
     public abstract class MonitorBase : IDisposable
     {
-        protected MonitorBase(Subreddit subreddit, InMemoryDb db, ILogger logger)
+        protected MonitorBase(Subreddit subreddit, IRepository repository, ILogger logger)
         {
             Subreddit = subreddit ?? throw new ArgumentNullException(nameof(subreddit));
-            Db = db ?? throw new ArgumentNullException(nameof(db));
+            Repository = repository ?? throw new ArgumentNullException(nameof(repository));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         protected ILogger Logger { get; }
         protected Subreddit Subreddit { get; }
-        protected InMemoryDb Db { get; }
+        protected IRepository Repository { get; }
 
         public abstract void Start(TimeSpan monitoringInterval);
 

@@ -11,8 +11,8 @@ namespace RedditStats.Infra.Monitors
     /// </summary>
     public sealed class CommentsMonitor : MonitorBase
     {
-        public CommentsMonitor(Subreddit subreddit, InMemoryDb db, ILogger<CommentsMonitor> logger)
-            : base(subreddit, db, logger)
+        public CommentsMonitor(Subreddit subreddit, IRepository repository, ILogger<CommentsMonitor> logger)
+            : base(subreddit, repository, logger)
         { }
 
         public override void Start(TimeSpan monitoringInterval)
@@ -28,31 +28,32 @@ namespace RedditStats.Infra.Monitors
         }
 
         /// <summary>
-        /// Adds new comments to the `InMemoryDb.RedditComments`.
-        /// Adds comment authors to the `InMemoryDb.RedditUsers`.
+        /// Adds new comments to `Repository`.
+        /// Adds comments authors to `Repository`.
         /// Updates user `RedditUsers.TotalComments`.
         /// </summary>
-        private void OnUpdate(object? sender, CommentsUpdateEventArgs eventArgs)
+        private async void OnUpdate(object? sender, CommentsUpdateEventArgs eventArgs)
         {
             foreach (var comment in eventArgs.Added)
             {
-                // Add each post to `db`
-                Db.Add(new RedditComment { Id = comment.Id, Created = comment.Created, Author = comment.Author, UpVotes = comment.UpVotes, Score = comment.Score, NumReplies = comment.NumReplies, Permalink = comment.Permalink });
+                // Add each new comment to `Repository`
+                var entity = new RedditComment { Id = comment.Id, Created = comment.Created, Author = comment.Author, UpVotes = comment.UpVotes, Score = comment.Score, NumReplies = comment.NumReplies, Permalink = comment.Permalink };
+                
+                await Repository.InsertAsync(entity).ConfigureAwait(false);
 
-                Db.SaveChanges();
+                await Repository.SaveAsync().ConfigureAwait(false);
 
-                var existingUser = Db.Set<RedditUser>().FirstOrDefault(u => u.Name == comment.Author);
+                var existingUser = await Repository.GetAsync<RedditUser>(u => u.Name == comment.Author).ConfigureAwait(false);
 
                 if (existingUser != null)
-                    // If the user from the comments exists in the `db` (in monitoring window) increment the user total comments.
+                    // Update existing user total comments (in the monitoring window).
                     existingUser.TotalComments++;
-
                 else
-                    // Adding a new user to the `db`
-                    Db.Add(new RedditUser { Name = comment.Author, TotalComments = 1 });
+                    // Adding a new user to the `Repository`
+                    await Repository.InsertAsync(new RedditUser { Name = comment.Author, TotalComments = 1 }).ConfigureAwait(false);
 
-                // Save `db` changes
-                Db.SaveChanges();
+                // Save `Repository` changes
+                await Repository.SaveAsync().ConfigureAwait(false);
             }
         }
     }

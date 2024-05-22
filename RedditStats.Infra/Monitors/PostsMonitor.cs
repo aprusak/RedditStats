@@ -12,8 +12,8 @@ namespace RedditStats.AppCore.Services
     /// </summary>
     public sealed class PostsMonitor : MonitorBase
     {
-        public PostsMonitor(Subreddit subreddit, InMemoryDb db, ILogger<PostsMonitor> logger)
-            : base(subreddit, db, logger)
+        public PostsMonitor(Subreddit subreddit, IRepository repository, ILogger<PostsMonitor> logger)
+            : base(subreddit, repository, logger)
         { }
         
         public override void Start(TimeSpan monitoringInterval)
@@ -29,30 +29,32 @@ namespace RedditStats.AppCore.Services
         }
 
         /// <summary>
-        /// Adds new posts to the `InMemoryDb.RedditPosts`.
-        /// Adds post authors to the `InMemoryDb.RedditUsers`.
+        /// Adds new posts to `Repository`.
+        /// Adds post authors to `Repository`.
         /// Updates user `RedditUsers.TotalPosts`.
         /// </summary>
-        private void OnUpdate(object? sender, PostsUpdateEventArgs eventArgs)
+        private async void OnUpdate(object? sender, PostsUpdateEventArgs eventArgs)
         {
             foreach (Post post in eventArgs.Added)
             {
-                // Add each post to `db`
-                Db.Add(new RedditPost { PostId = post.Id, Created = post.Created, Author = post.Author, Title = post.Title, UpVotes = post.UpVotes, Score = post.Score, Permalink = post.Permalink });
+                var entity = new RedditPost { PostId = post.Id, Created = post.Created, Author = post.Author, Title = post.Title, UpVotes = post.UpVotes, Score = post.Score, Permalink = post.Permalink };
 
-                Db.SaveChanges();
+                // Add each new post to `Repository`
+                await Repository.InsertAsync(entity).ConfigureAwait(false);
 
-                var existingUser = Db.Set<RedditUser>().FirstOrDefault(u => u.Name == post.Author);
+                await Repository.SaveAsync().ConfigureAwait(false);
+
+                var existingUser = await Repository.GetAsync<RedditUser>(u => u.Name == post.Author).ConfigureAwait(false);
 
                 if (existingUser != null)
-                    // If the user from the post exists in the `db` (in monitoring window) increment the user total posts.
+                    // Update existing user total posts (in the monitoring window).
                     existingUser.TotalPosts++;
                 else
-                    // Adding a new user to the `db`
-                    Db.Add(new RedditUser { Name = post.Author, TotalPosts = 1 });
+                    // Adding a new user to the `Repository`
+                    await Repository.InsertAsync(new RedditUser { Name = post.Author, TotalPosts = 1 }).ConfigureAwait(false);
 
-                // Save `db` changes
-                Db.SaveChanges();
+                // Save `Repository` changes
+                await Repository.SaveAsync().ConfigureAwait(false);
             }
         }
     }
