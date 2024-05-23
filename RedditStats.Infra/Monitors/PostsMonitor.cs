@@ -18,13 +18,13 @@ namespace RedditStats.Infra.Monitors
         public override void Start(TimeSpan monitoringInterval)
         {
             Subreddit.Posts.MonitorNew((int)monitoringInterval.TotalMilliseconds); // Turn on monitoring
-            Subreddit.Posts.NewUpdated += OnUpdate;
+            Subreddit.Posts.NewUpdated += OnUpdate; // Subscribe to Subreddit new post events
         }
 
         public override void Stop()
         {
+            Subreddit.Posts.NewUpdated -= OnUpdate; // Unsubscribe from Subreddit new post events
             Subreddit.Posts.MonitorNew();  // Turn off the monitoring
-            Subreddit.Posts.NewUpdated -= OnUpdate; // Subscribe to Subreddit new post events
         }
 
         /// <summary>

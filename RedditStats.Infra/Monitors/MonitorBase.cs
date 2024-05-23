@@ -24,7 +24,7 @@ namespace RedditStats.Infra.Monitors
 
         public abstract void Stop();
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             Stop();
         }
