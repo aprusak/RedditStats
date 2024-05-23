@@ -41,11 +41,11 @@ else app.UseExceptionHandler("/error");
 
 // Using minimal API pattern
 // Adding API methods for supported stats. To extend support for new stats new API methods may need to be added.
-app.MapGet("/GetRankedPosts", async ([FromServices] IRepository repository) => TypedResults.Ok((await repository.GetAsync<RedditPost>().ConfigureAwait(false)).OrderByDescending(p => p.UpVotes)));
+app.MapGet("/GetPosts", async ([FromServices] IRepository repository) => TypedResults.Ok((await repository.GetAsync<RedditPost>().ConfigureAwait(false)).OrderByDescending(p => p.UpVotes)));
 
-app.MapGet("/GetRankedUsers", async ([FromServices] IRepository repository) => TypedResults.Ok((await repository.GetAsync<RedditUser>().ConfigureAwait(false)).OrderByDescending(u => u.TotalPosts + u.TotalComments)));
+app.MapGet("/GetUsers", async ([FromServices] IRepository repository) => TypedResults.Ok((await repository.GetAsync<RedditUser>().ConfigureAwait(false)).OrderByDescending(u => u.TotalPosts + u.TotalComments)));
 
-app.MapGet("/GetRankedComments", async ([FromServices] IRepository repository) => TypedResults.Ok((await repository.GetAsync<RedditComment>().ConfigureAwait(false)).OrderByDescending(c => c.UpVotes)));
+app.MapGet("/GetComments", async ([FromServices] IRepository repository) => TypedResults.Ok((await repository.GetAsync<RedditComment>().ConfigureAwait(false)).OrderByDescending(c => c.UpVotes)));
 
 app.MapGet("/", () => $"RedditStats.WebAPI has started!");
 
