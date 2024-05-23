@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RedditStats.AppCore.Configuration;
 using RedditStats.AppCore.Entities;
-using RedditStats.AppCore.Services;
 using RedditStats.Infra.Monitors;
 using RedditStats.Infra.Reddit;
 using RedditStats.Infra.Storage;

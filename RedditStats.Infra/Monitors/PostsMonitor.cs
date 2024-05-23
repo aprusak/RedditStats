@@ -2,10 +2,9 @@
 using Reddit.Controllers;
 using Reddit.Controllers.EventArgs;
 using RedditStats.AppCore.Entities;
-using RedditStats.Infra.Monitors;
 using RedditStats.Infra.Storage;
 
-namespace RedditStats.AppCore.Services
+namespace RedditStats.Infra.Monitors
 {
     /// <summary>
     /// Monitors new user posts in a given Subreddit.
